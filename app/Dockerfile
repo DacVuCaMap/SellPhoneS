@@ -1,3 +1,7 @@
+FROM jelastic/maven:3.9.5-openjdk-22 AS build
+COPY . .
+RUN mvn clean package -DskipTests
+
 FROM openjdk:22-jdk
 COPY --from=build /target/app-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
