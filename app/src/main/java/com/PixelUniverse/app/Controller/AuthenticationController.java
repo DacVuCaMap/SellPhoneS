@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> LoginAccount(@RequestBody  LoginRequest loginRequest, HttpServletResponse httpServletResponse){
         System.out.println(loginRequest.getEmail());
         return authenticationService.LoginAccount(loginRequest,httpServletResponse);

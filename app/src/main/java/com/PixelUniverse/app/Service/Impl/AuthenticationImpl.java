@@ -44,7 +44,6 @@ public class AuthenticationImpl implements AuthenticationService {
     private final CookieService cookieService;
     @Override
     public ResponseEntity<?> LoginAccount(LoginRequest loginRequest, HttpServletResponse httpServletResponse) {
-        System.out.println(loginRequest);
         // check email exists
         Optional<Account> checkAcc = accountRepository.findByEmail(loginRequest.getEmail());
         if (checkAcc.isEmpty()){
