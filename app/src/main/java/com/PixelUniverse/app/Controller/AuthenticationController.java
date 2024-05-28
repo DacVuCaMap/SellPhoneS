@@ -16,6 +16,7 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     @GetMapping("/login")
     public ResponseEntity<?> LoginAccount(@RequestBody  LoginRequest loginRequest, HttpServletResponse httpServletResponse){
+        System.out.println(loginRequest.getEmail());
         return authenticationService.LoginAccount(loginRequest,httpServletResponse);
     }
 
@@ -23,4 +24,5 @@ public class AuthenticationController {
     public ResponseEntity<?> RegisterAccount(@RequestBody RegisterRequest registerRequest){
         return authenticationService.RegisterAccount(registerRequest);
     }
+
 }
