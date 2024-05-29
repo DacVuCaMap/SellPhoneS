@@ -8,6 +8,7 @@ import com.PixelUniverse.app.Repository.RoleRepository;
 import com.PixelUniverse.app.Repository.TokenRepository;
 import com.PixelUniverse.app.Request.Authentication.LoginRequest;
 import com.PixelUniverse.app.Request.Authentication.RegisterRequest;
+import com.PixelUniverse.app.Response.Authentication.LoginResponse;
 import com.PixelUniverse.app.Service.AccountService;
 import com.PixelUniverse.app.Service.AuthenticationService;
 import com.PixelUniverse.app.Service.CookieService;
@@ -68,7 +69,12 @@ public class AuthenticationImpl implements AuthenticationService {
         int age = loginRequest.isRemember() ? -1 : 24*60*60;
         Cookie cookie = cookieService.setCookieValue("jwt","/",true,age,token);
         httpServletResponse.addCookie(cookie);
-        return ResponseEntity.ok().body(token);
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setMess("Login success");
+        loginResponse.setToken(token);
+        loginResponse.setRoles(account.getRoleSet());
+
+        return ResponseEntity.ok().body(loginResponse);
     }
 
     @Override
