@@ -68,7 +68,7 @@ public class AuthenticationImpl implements AuthenticationService {
         int age = loginRequest.isRemember() ? -1 : 24*60*60;
         Cookie cookie = cookieService.setCookieValue("jwt","/",true,age,token);
         httpServletResponse.addCookie(cookie);
-        return ResponseEntity.ok().body("Login Success");
+        return ResponseEntity.ok().body(token);
     }
 
     @Override
