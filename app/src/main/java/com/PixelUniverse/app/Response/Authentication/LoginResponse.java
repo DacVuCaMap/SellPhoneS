@@ -12,4 +12,7 @@ public class LoginResponse {
     private String mess;
     private String token;
     private Set<Role> roles;
+    private String name;
+    private String email;
+    private String avatar;
 }

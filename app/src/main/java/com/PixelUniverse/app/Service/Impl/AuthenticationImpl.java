@@ -73,7 +73,9 @@ public class AuthenticationImpl implements AuthenticationService {
         loginResponse.setMess("Login success");
         loginResponse.setToken(token);
         loginResponse.setRoles(account.getRoleSet());
-
+        loginResponse.setName(account.getName());
+        loginResponse.setEmail(account.getEmail());
+        loginResponse.setAvatar(account.getAvatar());
         return ResponseEntity.ok().body(loginResponse);
     }
 
