@@ -83,6 +83,7 @@ public class AuthenticationImpl implements AuthenticationService {
     public ResponseEntity<?> RegisterAccount(RegisterRequest registerRequest) {
         //check exists email
         Optional<Account> checkEmail = accountRepository.findByEmail(registerRequest.getEmail());
+        System.out.println(checkEmail);
         if (checkEmail.isPresent()){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(registerRequest.getEmail()+" email already exists");
         }
