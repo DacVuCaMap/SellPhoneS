@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize->
                 authorize
                         .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 ).authenticationProvider(customAuthenticationProvider)
                 .addFilterBefore(tokenFilterConfig, UsernamePasswordAuthenticationFilter.class);
         http.cors((cors)->cors.configurationSource(corsConfiguration()));
