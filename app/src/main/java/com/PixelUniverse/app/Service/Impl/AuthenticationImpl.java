@@ -83,7 +83,6 @@ public class AuthenticationImpl implements AuthenticationService {
     public ResponseEntity<?> RegisterAccount(RegisterRequest registerRequest) {
         //check exists email
         Optional<Account> checkEmail = accountRepository.findByEmail(registerRequest.getEmail());
-        System.out.println(checkEmail);
         if (checkEmail.isPresent()){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(registerRequest.getEmail()+" email already exists");
         }
@@ -97,7 +96,7 @@ public class AuthenticationImpl implements AuthenticationService {
         account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         account.setWallet(0.0);
         account.setCreateAt(new Date());
-        account.setLocked(true);
+        account.setLocked(false);
         account.setDeleted(false);
         // set role
         String roleString;
