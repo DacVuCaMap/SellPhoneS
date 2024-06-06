@@ -134,14 +134,16 @@ public class AuthenticationImpl implements AuthenticationService {
         account.setRoleSet(new HashSet<>());
         account.getRoleSet().add(role);
         //save image
-        String linkImage="";
-        try{
-            linkImage = imageService.uploadImageToCloud(image);
-        }catch (IOException e){
-            e.printStackTrace();
-            return;
+        if (image!=null){
+            String linkImage="";
+            try{
+                linkImage = imageService.uploadImageToCloud(image);
+            }catch (IOException e){
+                e.printStackTrace();
+                return;
+            }
+            account.setAvatar(linkImage);
         }
-        account.setAvatar(linkImage);
         accountRepository.save(account);
     }
 }
