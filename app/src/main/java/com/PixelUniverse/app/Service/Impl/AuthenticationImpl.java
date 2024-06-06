@@ -9,10 +9,7 @@ import com.PixelUniverse.app.Repository.TokenRepository;
 import com.PixelUniverse.app.Request.Authentication.LoginRequest;
 import com.PixelUniverse.app.Request.Authentication.RegisterRequest;
 import com.PixelUniverse.app.Response.Authentication.LoginResponse;
-import com.PixelUniverse.app.Service.AccountService;
-import com.PixelUniverse.app.Service.AuthenticationService;
-import com.PixelUniverse.app.Service.CookieService;
-import com.PixelUniverse.app.Service.TokenService;
+import com.PixelUniverse.app.Service.*;
 import com.PixelUniverse.app.Validators.ObjectValidators;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,7 +22,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
@@ -43,6 +43,7 @@ public class AuthenticationImpl implements AuthenticationService {
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final CookieService cookieService;
+    private final ImageService imageService;
     @Override
     public ResponseEntity<?> LoginAccount(LoginRequest loginRequest, HttpServletResponse httpServletResponse) {
         // check email exists
@@ -80,7 +81,7 @@ public class AuthenticationImpl implements AuthenticationService {
     }
 
     @Override
-    public ResponseEntity<?> RegisterAccount(RegisterRequest registerRequest) {
+    public ResponseEntity<?> RegisterAccount(RegisterRequest registerRequest,MultipartFile image) {
         //check exists email
         Optional<Account> checkEmail = accountRepository.findByEmail(registerRequest.getEmail());
         if (checkEmail.isPresent()){
@@ -91,6 +92,27 @@ public class AuthenticationImpl implements AuthenticationService {
         if (!violation.isEmpty()){
             return ResponseEntity.badRequest().body(String.join(" | ",violation));
         }
+        saveAccount(registerRequest,image);
+        return ResponseEntity.ok().body(String.format("Email %s register success", registerRequest.getEmail()));
+    }
+
+    @Override
+    public ResponseEntity<?> AddAccount(RegisterRequest registerRequest, MultipartFile image) {
+        //check exists email
+        Optional<Account> checkEmail = accountRepository.findByEmail(registerRequest.getEmail());
+        if (checkEmail.isPresent()){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(registerRequest.getEmail()+" email already exists");
+        }
+        //validation
+        var violation = RegisterValidators.validate(registerRequest);
+        if (!violation.isEmpty()){
+            return ResponseEntity.badRequest().body(String.join(" | ",violation));
+        }
+        saveAccount(registerRequest,image);
+        return ResponseEntity.ok().body(String.format("Email %s register success", registerRequest.getEmail()));
+    }
+
+    private void saveAccount(RegisterRequest registerRequest,MultipartFile image){
         // check register complete
         Account account = modelmapper.map(registerRequest,Account.class);
         account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
@@ -111,7 +133,15 @@ public class AuthenticationImpl implements AuthenticationService {
         });
         account.setRoleSet(new HashSet<>());
         account.getRoleSet().add(role);
+        //save image
+        String linkImage="";
+        try{
+            linkImage = imageService.uploadImageToCloud(image);
+        }catch (IOException e){
+            e.printStackTrace();
+            return;
+        }
+        account.setAvatar(linkImage);
         accountRepository.save(account);
-        return ResponseEntity.ok().body(String.format("Email %s register success", account.getEmail()));
     }
 }

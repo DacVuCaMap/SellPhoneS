@@ -5,6 +5,7 @@ import com.PixelUniverse.app.Entity.Role;
 import com.PixelUniverse.app.Repository.AccountRepository;
 import com.PixelUniverse.app.Request.Account.AccountDto;
 import com.PixelUniverse.app.Request.Account.AccountSaveObject;
+import com.PixelUniverse.app.Request.Authentication.RegisterRequest;
 import com.PixelUniverse.app.Service.AccountService;
 import com.PixelUniverse.app.Service.RoleService;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,12 @@ public class AccountImpl implements AccountService {
     public List<AccountDto> getAllAccount() {
         List<Account> accounts = accountRepository.findAllByIsDeletedFalse();
         return accounts.stream().map(this::mapDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean AddAccount(RegisterRequest registerRequest) {
+
+        return false;
     }
 
     @Override
