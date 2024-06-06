@@ -28,7 +28,7 @@ public class TokenFilterConfig extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
-        if (request.getServletPath().contains("api/auth")){
+        if (request.getServletPath().contains("api")){
             filterChain.doFilter(request,response);
             return;
         }
