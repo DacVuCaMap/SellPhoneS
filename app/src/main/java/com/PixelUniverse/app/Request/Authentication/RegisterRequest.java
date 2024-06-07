@@ -18,4 +18,5 @@ public class RegisterRequest {
     private String avatar;
     @Pattern(regexp = "^[0-9]+$",message = "Invalid PhoneNumber")
     private String phoneNumber;
+    private int role;
 }

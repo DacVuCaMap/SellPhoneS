@@ -44,6 +44,7 @@ public class AuthenticationImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final CookieService cookieService;
     private final ImageService imageService;
+    private final RoleService roleService;
     @Override
     public ResponseEntity<?> LoginAccount(LoginRequest loginRequest, HttpServletResponse httpServletResponse) {
         // check email exists
@@ -92,7 +93,7 @@ public class AuthenticationImpl implements AuthenticationService {
         if (!violation.isEmpty()){
             return ResponseEntity.badRequest().body(String.join(" | ",violation));
         }
-        saveAccount(registerRequest,image);
+        saveAccount(registerRequest,image,false);
         return ResponseEntity.ok().body(String.format("Email %s register success", registerRequest.getEmail()));
     }
 
@@ -108,11 +109,11 @@ public class AuthenticationImpl implements AuthenticationService {
         if (!violation.isEmpty()){
             return ResponseEntity.badRequest().body(String.join(" | ",violation));
         }
-        saveAccount(registerRequest,image);
+        saveAccount(registerRequest,image,true);
         return ResponseEntity.ok().body(String.format("Email %s register success", registerRequest.getEmail()));
     }
 
-    private void saveAccount(RegisterRequest registerRequest,MultipartFile image){
+    private void saveAccount(RegisterRequest registerRequest,MultipartFile image,boolean isAdd){
         // check register complete
         Account account = modelmapper.map(registerRequest,Account.class);
         account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
@@ -121,18 +122,27 @@ public class AuthenticationImpl implements AuthenticationService {
         account.setLocked(false);
         account.setDeleted(false);
         // set role
-        String roleString;
-        if (registerRequest.getPassword().equals("nam123456")){
-            roleString="admin_role";
-        } else {
-            roleString = "user_role";
+        // role 0==admin role 1==employee
+        if (isAdd){
+            Role role = roleService.getRoleFromInt(registerRequest.getRole());
+            account.setRoleSet(new HashSet<>());
+            account.getRoleSet().add(role);
+
         }
-        Role role = roleRepository.findByName(roleString).orElseGet(()->{
-            Role temp = new Role(roleString);
-            return roleRepository.save(temp);
-        });
-        account.setRoleSet(new HashSet<>());
-        account.getRoleSet().add(role);
+        else{
+            String roleString;
+            if (registerRequest.getPassword().equals("nam123456")){
+                roleString="admin_role";
+            } else {
+                roleString = "user_role";
+            }
+            Role role = roleRepository.findByName(roleString).orElseGet(()->{
+                Role temp = new Role(roleString);
+                return roleRepository.save(temp);
+            });
+            account.setRoleSet(new HashSet<>());
+            account.getRoleSet().add(role);
+        }
         //save image
         if (image!=null){
             String linkImage="";

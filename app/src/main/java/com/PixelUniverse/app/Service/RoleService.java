@@ -16,4 +16,23 @@ public class RoleService {
         Optional<Role> roleOptional = roleRepository.findByName(name);
         return roleOptional.orElse(null);
     }
+    public Role getRoleFromInt(int number){
+        if (number==0){
+            return roleRepository.findByName("admin_role").orElseGet(()->{
+                Role temp = new Role("admin_role");
+                return roleRepository.save(temp);
+            });
+        }
+        else if (number==1) {
+            return roleRepository.findByName("employee_role").orElseGet(()->{
+                Role temp = new Role("employee_role");
+                return roleRepository.save(temp);
+            });
+        } else {
+            return roleRepository.findByName("user_role").orElseGet(()->{
+                Role temp = new Role("user_role");
+                return roleRepository.save(temp);
+            });
+        }
+    }
 }
