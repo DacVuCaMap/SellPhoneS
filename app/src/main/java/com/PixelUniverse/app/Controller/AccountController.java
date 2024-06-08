@@ -6,6 +6,8 @@ import com.PixelUniverse.app.Request.Account.AccountSaveObject;
 import com.PixelUniverse.app.Request.Authentication.RegisterRequest;
 import com.PixelUniverse.app.Service.AccountService;
 import com.PixelUniverse.app.Service.AuthenticationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.apache.catalina.connector.Response;
 import org.modelmapper.ModelMapper;
@@ -43,8 +45,14 @@ public class AccountController {
         return ResponseEntity.ok().body(account.get().getEmail()+" is deleted");
     }
     @PostMapping("/add")
-    public ResponseEntity<?> addAccount(@RequestParam("image")MultipartFile image,@RequestParam("formJson") RegisterRequest registerRequest){
-
+    public ResponseEntity<?> addAccount(@RequestParam("image")MultipartFile image,@RequestParam("formJson") String formJson){
+        ObjectMapper objectMapper = new ObjectMapper();
+        RegisterRequest registerRequest;
+        try {
+            registerRequest = objectMapper.readValue(formJson, RegisterRequest.class);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.badRequest().body("Form gui khong phu hop");
+        }
         return authenticationService.AddAccount(registerRequest,image);
     }
 
