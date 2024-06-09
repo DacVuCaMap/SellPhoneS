@@ -9,6 +9,7 @@ import com.PixelUniverse.app.Repository.TokenRepository;
 import com.PixelUniverse.app.Request.Authentication.LoginRequest;
 import com.PixelUniverse.app.Request.Authentication.RegisterRequest;
 import com.PixelUniverse.app.Response.Authentication.LoginResponse;
+import com.PixelUniverse.app.Response.Authentication.RegisterResponse;
 import com.PixelUniverse.app.Service.*;
 import com.PixelUniverse.app.Validators.ObjectValidators;
 import jakarta.servlet.http.Cookie;
@@ -102,15 +103,18 @@ public class AuthenticationImpl implements AuthenticationService {
         //check exists email
         Optional<Account> checkEmail = accountRepository.findByEmail(registerRequest.getEmail());
         if (checkEmail.isPresent()){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(registerRequest.getEmail()+" email already exists");
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(registerRequest.getEmail()+" email already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new RegisterResponse(registerRequest.getEmail()+" email already exists"));
         }
         //validation
         var violation = RegisterValidators.validate(registerRequest);
         if (!violation.isEmpty()){
-            return ResponseEntity.badRequest().body(String.join(" | ",violation));
+//            return ResponseEntity.badRequest().body(String.join(" | ",violation));
+            return ResponseEntity.badRequest().body(new RegisterResponse(String.join(" | ",violation)));
         }
         saveAccount(registerRequest,image,true);
-        return ResponseEntity.ok().body(String.format("Email %s register success", registerRequest.getEmail()));
+//        return ResponseEntity.ok().body(String.format("Email %s register success", registerRequest.getEmail()));
+        return ResponseEntity.ok().body(new RegisterResponse(String.format("Email %s register success", registerRequest.getEmail())));
     }
 
     private void saveAccount(RegisterRequest registerRequest,MultipartFile image,boolean isAdd){
@@ -154,6 +158,7 @@ public class AuthenticationImpl implements AuthenticationService {
             }
             account.setAvatar(linkImage);
         }
+        System.out.println(account);
         accountRepository.save(account);
     }
 }

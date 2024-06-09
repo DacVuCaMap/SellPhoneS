@@ -53,6 +53,7 @@ public class AccountController {
         } catch (JsonProcessingException e) {
             return ResponseEntity.badRequest().body("Form gui khong phu hop");
         }
+
         return authenticationService.AddAccount(registerRequest,image);
     }
 
