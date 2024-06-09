@@ -18,5 +18,5 @@ public class AccountSaveObject {
     private boolean isLocked;
     //role
     // flag ? "admin" == "user"
-    private boolean role;
+    private Integer role;
 }

@@ -6,6 +6,7 @@ import com.PixelUniverse.app.Repository.AccountRepository;
 import com.PixelUniverse.app.Request.Account.AccountDto;
 import com.PixelUniverse.app.Request.Account.AccountSaveObject;
 import com.PixelUniverse.app.Request.Authentication.RegisterRequest;
+import com.PixelUniverse.app.Response.Authentication.RegisterResponse;
 import com.PixelUniverse.app.Service.AccountService;
 import com.PixelUniverse.app.Service.RoleService;
 import lombok.AllArgsConstructor;
@@ -46,24 +47,22 @@ public class AccountImpl implements AccountService {
     public ResponseEntity<?> saveAccount(AccountSaveObject accountSaveObject) {
         Optional<Account> checkAccount = accountRepository.findById(accountSaveObject.getId());
         if (checkAccount.isEmpty()){
-            return ResponseEntity.badRequest().body(accountSaveObject.getEmail()+" not exists");
+            return ResponseEntity.badRequest().body(new RegisterResponse(accountSaveObject.getEmail()+" not exists"));
         }
         Account account = checkAccount.get();
         if (!accountSaveObject.getEmail().equals(account.getEmail())){
-            return ResponseEntity.badRequest().body("Cannot change Email");
+            return ResponseEntity.badRequest().body(new RegisterResponse("Cannot change Email"));
         }
         BeanUtils.copyProperties(accountSaveObject,account);
         //if null => do not set role
-        Role role = roleService.getRoleFromFlag(accountSaveObject.isRole());
-        if (role!=null){
-            Set<Role> roleSet = new HashSet<>();
-            roleSet.add(role);
-            account.setRoleSet(roleSet);
-        }
+        Role role = roleService.getRoleFromInt(accountSaveObject.getRole());
+        Set<Role> roleSet = new HashSet<>();
+        roleSet.add(role);
+        account.setRoleSet(roleSet);
         //set update at
         account.setUpdateAt(new Date());
         accountRepository.save(account);
-        return ResponseEntity.ok().body(account.getEmail()+" update success");
+        return ResponseEntity.ok().body(new RegisterResponse(account.getEmail()+" update success"));
     }
     public AccountDto mapDto(Account account){
         return modelMapper.map(account,AccountDto.class);
