@@ -9,6 +9,7 @@ import com.PixelUniverse.app.Request.Authentication.RegisterRequest;
 import com.PixelUniverse.app.Response.Authentication.RegisterResponse;
 import com.PixelUniverse.app.Service.AccountService;
 import com.PixelUniverse.app.Service.RoleService;
+import com.PixelUniverse.app.Validators.ObjectValidators;
 import lombok.AllArgsConstructor;
 import org.apache.catalina.connector.Response;
 import org.modelmapper.ModelMapper;
@@ -16,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.xml.validation.Validator;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ public class AccountImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final RoleService roleService;
     private final ModelMapper modelMapper;
+    private final ObjectValidators<AccountSaveObject> saveObjectObjectValidators;
     @Override
     public List<AccountDto> getAllAccount() {
         List<Account> accounts = accountRepository.findAllByIsDeletedFalse();
@@ -46,6 +49,11 @@ public class AccountImpl implements AccountService {
     @Override
     public ResponseEntity<?> saveAccount(AccountSaveObject accountSaveObject) {
         Optional<Account> checkAccount = accountRepository.findById(accountSaveObject.getId());
+
+        var violation = saveObjectObjectValidators.validate(accountSaveObject);
+        if (!violation.isEmpty()){
+            return ResponseEntity.badRequest().body(String.join(" | ",violation));
+        }
         if (checkAccount.isEmpty()){
             return ResponseEntity.badRequest().body(new RegisterResponse(accountSaveObject.getEmail()+" not exists"));
         }
@@ -54,7 +62,11 @@ public class AccountImpl implements AccountService {
             return ResponseEntity.badRequest().body(new RegisterResponse("Cannot change Email"));
         }
         BeanUtils.copyProperties(accountSaveObject,account);
+        System.out.println(account);
         //if null => do not set role
+        if (accountSaveObject.getRole()==null){
+            accountSaveObject.setRole(3);
+        }
         Role role = roleService.getRoleFromInt(accountSaveObject.getRole());
         Set<Role> roleSet = new HashSet<>();
         roleSet.add(role);
