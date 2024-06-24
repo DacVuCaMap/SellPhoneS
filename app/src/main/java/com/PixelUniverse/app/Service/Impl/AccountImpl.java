@@ -8,6 +8,7 @@ import com.PixelUniverse.app.Request.Account.AccountSaveObject;
 import com.PixelUniverse.app.Request.Authentication.RegisterRequest;
 import com.PixelUniverse.app.Response.Authentication.RegisterResponse;
 import com.PixelUniverse.app.Service.AccountService;
+import com.PixelUniverse.app.Service.ImageService;
 import com.PixelUniverse.app.Service.RoleService;
 import com.PixelUniverse.app.Validators.ObjectValidators;
 import lombok.AllArgsConstructor;
@@ -16,8 +17,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.validation.Validator;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +31,7 @@ public class AccountImpl implements AccountService {
     private final RoleService roleService;
     private final ModelMapper modelMapper;
     private final ObjectValidators<AccountSaveObject> saveObjectObjectValidators;
+    private final ImageService imageService;
     @Override
     public List<AccountDto> getAllAccount() {
         List<Account> accounts = accountRepository.findAllByIsDeletedFalse();
@@ -47,7 +51,7 @@ public class AccountImpl implements AccountService {
     }
 
     @Override
-    public ResponseEntity<?> saveAccount(AccountSaveObject accountSaveObject) {
+    public ResponseEntity<?> saveAccount(AccountSaveObject accountSaveObject, MultipartFile image) {
         Optional<Account> checkAccount = accountRepository.findById(accountSaveObject.getId());
 
         var violation = saveObjectObjectValidators.validate(accountSaveObject);
@@ -73,6 +77,17 @@ public class AccountImpl implements AccountService {
         account.setRoleSet(roleSet);
         //set update at
         account.setUpdateAt(new Date());
+        //save image
+        if (image!=null){
+            String linkImage="";
+            try{
+                linkImage = imageService.uploadImageToCloud(image);
+            }catch (IOException e){
+                e.printStackTrace();
+                return ResponseEntity.badRequest().body(new RegisterResponse("Image upload failed"));
+            }
+            account.setAvatar(linkImage);
+        }
         accountRepository.save(account);
         return ResponseEntity.ok().body(new RegisterResponse(account.getEmail()+" update success"));
     }

@@ -6,6 +6,7 @@ import com.PixelUniverse.app.Request.Account.AccountSaveObject;
 import com.PixelUniverse.app.Request.Authentication.RegisterRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -14,5 +15,5 @@ public interface AccountService {
     List<AccountDto> getAllAccount();
     boolean AddAccount(RegisterRequest registerRequest);
     Account findAccByEmail(String email);
-    ResponseEntity<?> saveAccount(AccountSaveObject accountSaveObject);
+    ResponseEntity<?> saveAccount(AccountSaveObject accountSaveObject, MultipartFile image);
 }

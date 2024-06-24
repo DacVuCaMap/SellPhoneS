@@ -30,8 +30,15 @@ public class AccountController {
         return ResponseEntity.ok().body(accountService.getAllAccount());
     }
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestBody AccountSaveObject accountSaveObject){
-        return accountService.saveAccount(accountSaveObject);
+    public ResponseEntity<?> save(@RequestParam("image")MultipartFile image,@RequestParam("formJson") String formJson){
+        AccountSaveObject accountSaveObject;
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            accountSaveObject = objectMapper.readValue(formJson, AccountSaveObject.class);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.badRequest().body("Form gui khong phu hop");
+        }
+        return accountService.saveAccount(accountSaveObject,image);
     }
     @GetMapping("/delete/{id}")
     public ResponseEntity<?> delAccount(@PathVariable Long id){
