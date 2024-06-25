@@ -4,6 +4,7 @@ import com.PixelUniverse.app.Entity.Account;
 import com.PixelUniverse.app.Repository.AccountRepository;
 import com.PixelUniverse.app.Request.Account.AccountSaveObject;
 import com.PixelUniverse.app.Request.Authentication.RegisterRequest;
+import com.PixelUniverse.app.Response.Authentication.RegisterResponse;
 import com.PixelUniverse.app.Service.AccountService;
 import com.PixelUniverse.app.Service.AuthenticationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,7 +37,7 @@ public class AccountController {
         try {
             accountSaveObject = objectMapper.readValue(formJson, AccountSaveObject.class);
         } catch (JsonProcessingException e) {
-            return ResponseEntity.badRequest().body("Form gui khong phu hop");
+            return ResponseEntity.badRequest().body(new RegisterResponse("Form not invalid"));
         }
         return accountService.saveAccount(accountSaveObject,image);
     }

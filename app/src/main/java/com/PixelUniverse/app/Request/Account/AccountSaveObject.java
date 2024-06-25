@@ -19,7 +19,6 @@ public class AccountSaveObject {
     private String name;
     private String avatar;
     private String phoneNumber;
-    private Date updateAt;
     private boolean isLocked;
     //role
     // flag ? "admin" == "user"
