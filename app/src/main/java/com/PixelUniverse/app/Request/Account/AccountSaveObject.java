@@ -17,7 +17,6 @@ public class AccountSaveObject {
     private String email;
     @NotBlank(message = "name not blank")
     private String name;
-    private String avatar;
     private String phoneNumber;
     private boolean isLocked;
     //role
