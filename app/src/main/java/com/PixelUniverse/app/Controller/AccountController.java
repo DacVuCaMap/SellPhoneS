@@ -34,7 +34,7 @@ public class AccountController {
     public ResponseEntity<?> save(@RequestParam("image")MultipartFile image,@RequestParam("formJson") String formJson){
         AccountSaveObject accountSaveObject;
         ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println(formJson);
+//        System.out.println(formJson);
         try {
             accountSaveObject = objectMapper.readValue(formJson, AccountSaveObject.class);
         } catch (JsonProcessingException e) {
