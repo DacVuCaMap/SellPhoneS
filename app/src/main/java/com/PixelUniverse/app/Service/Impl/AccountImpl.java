@@ -65,8 +65,11 @@ public class AccountImpl implements AccountService {
         if (!accountSaveObject.getEmail().equals(account.getEmail())){
             return ResponseEntity.badRequest().body(new RegisterResponse("Cannot change Email"));
         }
+        if (accountSaveObject.getAvatar()==null){
+            accountSaveObject.setAvatar("");
+        }
         BeanUtils.copyProperties(accountSaveObject,account);
-        System.out.println(account);
+//        System.out.println(account);
         //if null => do not set role
         if (accountSaveObject.getRole()==null){
             accountSaveObject.setRole(3);

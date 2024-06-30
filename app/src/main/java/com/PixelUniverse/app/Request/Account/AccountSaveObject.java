@@ -22,4 +22,5 @@ public class AccountSaveObject {
     //role
     // flag ? "admin" == "user"
     private Integer role;
+    private String avatar;
 }
