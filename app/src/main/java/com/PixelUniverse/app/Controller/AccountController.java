@@ -31,10 +31,13 @@ public class AccountController {
         return ResponseEntity.ok().body(accountService.getAllAccount());
     }
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestParam("image")MultipartFile image,@RequestParam("formJson") String formJson){
+    public ResponseEntity<?> save(@RequestParam(value = "image", required = false)MultipartFile image,@RequestParam("formJson") String formJson){
         AccountSaveObject accountSaveObject;
         ObjectMapper objectMapper = new ObjectMapper();
-//        System.out.println(formJson);
+        System.out.println(image);
+        if (image == null || image.isEmpty()) {
+            image = null; // đảm bảo image là null nếu không có file được tải lên
+        }
         try {
             accountSaveObject = objectMapper.readValue(formJson, AccountSaveObject.class);
         } catch (JsonProcessingException e) {
