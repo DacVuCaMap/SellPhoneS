@@ -1,7 +1,9 @@
 package com.PixelUniverse.app.Controller;
 
 import com.PixelUniverse.app.Entity.Account;
+import com.PixelUniverse.app.Entity.Role;
 import com.PixelUniverse.app.Repository.AccountRepository;
+import com.PixelUniverse.app.Request.Account.AccountChart;
 import com.PixelUniverse.app.Request.Account.AccountSaveObject;
 import com.PixelUniverse.app.Request.Authentication.RegisterRequest;
 import com.PixelUniverse.app.Response.Authentication.RegisterResponse;
@@ -16,6 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -67,6 +73,35 @@ public class AccountController {
         }
 
         return authenticationService.AddAccount(registerRequest,image);
+    }
+
+    @GetMapping("/chart")
+    public ResponseEntity<?> chartAcount(){
+        int currentYear = LocalDate.now().getYear();
+        List<Account> accountList = accountRepository.findAllByCreateAtYear(currentYear);
+        List<AccountChart> result = new ArrayList<>();
+        int[][] arr = new int[12][3];
+        for (Account acc : accountList){
+            int monthValue = acc.getCreateAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getMonthValue();
+            Optional<Role> role = acc.getRoleSet().stream().findFirst();
+            if (role.isEmpty()){
+                return ResponseEntity.badRequest().body(new RegisterResponse("get role failed"));
+            }
+            int index =(int) role.get().getId().longValue();
+            System.out.println(index);
+            arr[monthValue-1][index]++;
+        }
+
+        List<AccountChart> accountCharts = new ArrayList<>();
+        for (int i=1;i<13;i++){
+            AccountChart accountChart = new AccountChart();
+            accountChart.setMonth(i);
+            accountChart.setAdmin(arr[i-1][0]);
+            accountChart.setEmployee(arr[i-1][1]);
+            accountChart.setClient(arr[i-1][2]);
+            accountCharts.add(accountChart);
+        }
+        return ResponseEntity.ok().body(accountCharts);
     }
 
 
