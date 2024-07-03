@@ -80,7 +80,7 @@ public class AccountController {
         int currentYear = LocalDate.now().getYear();
         List<Account> accountList = accountRepository.findAllByCreateAtYear(currentYear);
         List<AccountChart> result = new ArrayList<>();
-        int[][] arr = new int[12][3];
+        int[][] arr = new int[12][4];
         for (Account acc : accountList){
             int monthValue = acc.getCreateAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getMonthValue();
             Optional<Role> role = acc.getRoleSet().stream().findFirst();
@@ -88,8 +88,9 @@ public class AccountController {
                 return ResponseEntity.badRequest().body(new RegisterResponse("get role failed"));
             }
             int index =(int) role.get().getId().longValue();
-            System.out.println(index);
-            arr[monthValue-1][index]++;
+            if (index<4){
+                arr[monthValue-1][index]++;
+            }
         }
 
         List<AccountChart> accountCharts = new ArrayList<>();
